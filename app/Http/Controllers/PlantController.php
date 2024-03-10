@@ -34,18 +34,18 @@ class PlantController extends Controller
     {
         // Cache key for the individual plant
         $cacheKey = 'plant_' . $id;
-    
+
         // Check if data exists in cache
         if (Cache::has($cacheKey)) {
             return Cache::get($cacheKey);
         }
-    
+
         // Retrieve plant data by ID
-        $plant = Plant::with('relatedModel')->findOrFail($id);
-    
+        $plant = Plant::findOrFail($id);
+
         // Cache the data for future requests
         Cache::put($cacheKey, $plant, now()->addMinutes(10)); // Cache for 10 minutes
-    
+
         return response()->json($plant);
     }
 
@@ -68,8 +68,8 @@ class PlantController extends Controller
 
         $plant = Plant::create($validatedData);
 
-        // Clear the cache when a new plant is created
-        cache()->tags(['plants'])->flush();
+        // Clear the cache for all plants
+        Cache::forget('all_plants');
 
         return response()->json($plant, 201);
     }
@@ -94,8 +94,8 @@ class PlantController extends Controller
         $plant = Plant::findOrFail($id);
         $plant->update($validatedData);
 
-        // Clear the cache when a plant is updated
-        cache()->tags(['plants'])->flush();
+        // Clear the cache for all plants
+        Cache::forget('all_plants');
 
         return response()->json($plant, 200);
     }
@@ -105,8 +105,8 @@ class PlantController extends Controller
         $plant = Plant::findOrFail($id);
         $plant->delete();
 
-        // Clear the cache when a plant is deleted
-        cache()->tags(['plants'])->flush();
+        // Clear the cache for all plants
+        Cache::forget('all_plants');
 
         return response()->json(null, 204);
     }
