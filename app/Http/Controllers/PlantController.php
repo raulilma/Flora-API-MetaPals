@@ -22,7 +22,7 @@ class PlantController extends Controller
         }
 
         // Retrieve plants data with pagination
-        $plants = Plant::paginate($request->per_page ?? 10);
+        $plants = Plant::paginate($request->per_page ?? 20);
 
         // Cache the data for future requests
         Cache::put($cacheKey, $plants, now()->addMinutes(10)); // Cache for 10 minutes
@@ -32,11 +32,20 @@ class PlantController extends Controller
 
     public function show($id)
     {
-        // Implement caching for individual plant details
-        $plant = cache()->tags(['plants'])->rememberForever('plant_' . $id, function () use ($id) {
-            return Plant::with('relatedModel')->findOrFail($id);
-        });
-
+        // Cache key for the individual plant
+        $cacheKey = 'plant_' . $id;
+    
+        // Check if data exists in cache
+        if (Cache::has($cacheKey)) {
+            return Cache::get($cacheKey);
+        }
+    
+        // Retrieve plant data by ID
+        $plant = Plant::with('relatedModel')->findOrFail($id);
+    
+        // Cache the data for future requests
+        Cache::put($cacheKey, $plant, now()->addMinutes(10)); // Cache for 10 minutes
+    
         return response()->json($plant);
     }
 
