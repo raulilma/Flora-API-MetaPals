@@ -19,8 +19,10 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::get('/plants', [PlantController::class, 'index']);
-Route::get('/plants/{id}', [PlantController::class, 'show']);
-Route::post('/plants', [PlantController::class, 'store']);
-Route::put('/plants/{id}', [PlantController::class, 'update']);
-Route::delete('/plants/{id}', [PlantController::class, 'destroy']);
+Route::prefix('v1')->group(function () {
+    Route::get('/plants', [PlantController::class, 'index']);
+    Route::get('/plants/{id}', [PlantController::class, 'show']);
+    Route::post('/plants', [PlantController::class, 'store']);
+    Route::put('/plants/{id}', [PlantController::class, 'update']);
+    Route::delete('/plants/{id}', [PlantController::class, 'destroy']);
+});
