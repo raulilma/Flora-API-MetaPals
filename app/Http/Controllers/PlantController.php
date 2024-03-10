@@ -10,15 +10,18 @@ class PlantController extends Controller
 {
     public function index(Request $request)
     {
-        // Cache key for the plant index
-        $cacheKey = 'all_plants_' . $request->per_page ?? 10;
+        // Determine the current page from the request
+        $page = $request->input('page', 1);
+
+        // Cache key for the plant index including page
+        $cacheKey = 'all_plants_page_' . $page;
 
         // Check if data exists in cache
         if (Cache::has($cacheKey)) {
             return Cache::get($cacheKey);
         }
 
-        // Retrieve plants data
+        // Retrieve plants data with pagination
         $plants = Plant::paginate($request->per_page ?? 10);
 
         // Cache the data for future requests
