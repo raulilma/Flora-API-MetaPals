@@ -97,7 +97,11 @@ class PlantController extends Controller
         // Clear the cache for all plants
         Cache::forget('all_plants');
 
-        return response()->json($plant, 200);
+        // Cache key for the individual plant
+        $cacheKey = 'plant_' . $id;
+        Cache::forget($cacheKey);
+
+        return response()->json($validatedData);
     }
 
     public function destroy($id)
@@ -107,6 +111,10 @@ class PlantController extends Controller
 
         // Clear the cache for all plants
         Cache::forget('all_plants');
+
+        // Cache key for the individual plant
+        $cacheKey = 'plant_' . $id;
+        Cache::forget($cacheKey);
 
         return response()->json(null, 204);
     }
