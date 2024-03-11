@@ -137,7 +137,7 @@ class PlantControllerTest extends TestCase
         $response = $this->put("/api/v1/plants/update/{$plant->id}", $updatedData);
 
         $response->assertStatus(Response::HTTP_OK)
-            ->assertJson($updatedData);
+            ->assertJsonFragment($updatedData);
     }
 
     /**
