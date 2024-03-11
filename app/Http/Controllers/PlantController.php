@@ -108,14 +108,24 @@ class PlantController extends Controller
             'native_habitat' => 'required',
             'preferred_climate_zone' => 'required',
             'local_conservation_status' => 'required',
+            'biodiversity_attracting' => 'required',
+            'edible' => 'required',
+            'fragrant' => 'required',
+            'native_to_singapore' => 'required',
+            'coastal_and_marine' => 'required',
+            'freshwater' => 'required',
+            'terrestrial' => 'required',
         ]);
 
-        $plant = Plant::create($validatedData);
-
-        // Clear the cache for all plants
-        $this->forgetAllPlantsCache();
-
-        return response()->json($plant, 201);
+        try {
+            $plant = Plant::create($validatedData);
+            // Clear the cache for all plants
+            $this->forgetAllPlantsCache();
+            return response()->json($plant, 201);
+        } catch (\Exception $e) {
+            // Handle any unexpected errors
+            return response()->json(['error' => 'Failed to create plant because of '.$e.'.'], 500);
+        }
     }
 
     public function update(Request $request, $id)
@@ -133,6 +143,13 @@ class PlantController extends Controller
             'native_habitat' => 'required',
             'preferred_climate_zone' => 'required',
             'local_conservation_status' => 'required',
+            'biodiversity_attracting' => 'required',
+            'edible' => 'required',
+            'fragrant' => 'required',
+            'native_to_singapore' => 'required',
+            'coastal_and_marine' => 'required',
+            'freshwater' => 'required',
+            'terrestrial' => 'required',
         ]);
 
         $plant = Plant::findOrFail($id);

@@ -21,5 +21,22 @@ class Plant extends Model
         'native_habitat',
         'preferred_climate_zone',
         'local_conservation_status',
+        'biodiversity_attracting',
+        'edible',
+        'fragrant',
+        'native_to_singapore',
+        'coastal_and_marine',
+        'freshwater',
+        'terrestrial',
+    ];
+
+    protected $casts = [
+        'biodiversity_attracting' => 'boolean',
+        'edible' => 'boolean',
+        'fragrant' => 'boolean',
+        'native_to_singapore' => 'boolean',
+        'coastal_and_marine' => 'boolean',
+        'freshwater' => 'boolean',
+        'terrestrial' => 'boolean',
     ];
 }
