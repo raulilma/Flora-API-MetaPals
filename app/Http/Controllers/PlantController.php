@@ -13,22 +13,66 @@ class PlantController extends Controller
         // Determine the current page from the request
         $page = $request->input('page', 1);
 
-        // Cache key for the plant index including page
-        $cacheKey = 'all_plants_page_' . $page;
+        // Cache key for the plant index including page and filter parameters
+        $cacheKey = $this->generateCacheKey($request, $page);
 
         // Check if data exists in cache
         if (Cache::has($cacheKey)) {
-            return Cache::get($cacheKey);
+            $cachedData = Cache::get($cacheKey);
+            return response()->json(['data' => $cachedData, 'cache_key' => $cacheKey]);
         }
 
-        // Retrieve plants data with pagination
-        $plants = Plant::paginate($request->per_page ?? 20);
+        // Start with all plants
+        $query = Plant::query();
+
+        // Apply filters based on combinations available
+        if ($request->has('biodiversity_attracting')) {
+            $query->where('biodiversity_attracting', true);
+        }
+
+        if ($request->has('edible')) {
+            $query->where('edible', true);
+        }
+
+        if ($request->has('fragrant')) {
+            $query->where('fragrant', true);
+        }
+
+        if ($request->has('native_to_singapore')) {
+            $query->where('native_to_singapore', true);
+        }
+
+        if ($request->has('coastal_and_marine')) {
+            $query->where('coastal_and_marine', true);
+        }
+
+        if ($request->has('freshwater')) {
+            $query->where('freshwater', true);
+        }
+
+        if ($request->has('terrestrial')) {
+            $query->where('terrestrial', true);
+        }
+
+        // Paginate the filtered results
+        $perPage = $request->input('per_page', 20);
+        $plants = $query->paginate($perPage);
 
         // Cache the data for future requests
         Cache::put($cacheKey, $plants, now()->addMinutes(10)); // Cache for 10 minutes
 
-        return response()->json($plants);
+        return response()->json(['data' => $plants, 'cache_key' => $cacheKey]);
     }
+
+    private function generateCacheKey(Request $request, $page)
+    {
+        $filters = $request->except(['page', 'per_page']); // Exclude pagination parameters
+        ksort($filters); // Sort the filters to ensure consistent cache keys
+        $filterQueryString = http_build_query($filters);
+
+        return 'all_plants_page_' . $page . '_filters_' . $filterQueryString;
+    }
+
 
     public function show($id)
     {
@@ -69,7 +113,7 @@ class PlantController extends Controller
         $plant = Plant::create($validatedData);
 
         // Clear the cache for all plants
-        Cache::forget('all_plants');
+        $this->forgetAllPlantsCache();
 
         return response()->json($plant, 201);
     }
@@ -95,7 +139,7 @@ class PlantController extends Controller
         $plant->update($validatedData);
 
         // Clear the cache for all plants
-        Cache::forget('all_plants');
+        $this->forgetAllPlantsCache();
 
         // Cache key for the individual plant
         $cacheKey = 'plant_' . $id;
@@ -110,12 +154,25 @@ class PlantController extends Controller
         $plant->delete();
 
         // Clear the cache for all plants
-        Cache::forget('all_plants');
+        $this->forgetAllPlantsCache();
 
         // Cache key for the individual plant
         $cacheKey = 'plant_' . $id;
         Cache::forget($cacheKey);
 
         return response()->json(null, 204);
+    }
+
+    private function forgetAllPlantsCache()
+    {
+        // Get all cache keys
+        $keys = Cache::get('all_cache_keys', []);
+
+        // Loop through the keys and forget the ones that start with "all_plants_page_"
+        foreach ($keys as $key) {
+            if (strpos($key, 'all_plants_page_') === 0) {
+                Cache::forget($key);
+            }
+        }
     }
 }
