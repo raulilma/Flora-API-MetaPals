@@ -27,6 +27,14 @@ return new class extends Migration
             $table->string('preferred_climate_zone');
             $table->string('local_conservation_status');
         
+            $table->boolean('biodiversity_attracting')->default(false);
+            $table->boolean('edible')->default(false);
+            $table->boolean('fragrant')->default(false);
+            $table->boolean('native_to_singapore')->default(false);
+            $table->boolean('coastal_and_marine')->default(false);
+            $table->boolean('freshwater')->default(false);
+            $table->boolean('terrestrial')->default(false);
+
             $table->timestamps();
         });
     }

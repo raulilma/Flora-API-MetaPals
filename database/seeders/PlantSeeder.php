@@ -30,6 +30,13 @@ class PlantSeeder extends Seeder
                 'native_habitat' => $faker->word,
                 'preferred_climate_zone' => $faker->word,
                 'local_conservation_status' => $faker->word,
+                'biodiversity_attracting' => $faker->boolean(),
+                'edible' => $faker->boolean(),
+                'fragrant' => $faker->boolean(),
+                'native_to_singapore' => $faker->boolean(),
+                'coastal_and_marine' => $faker->boolean(),
+                'freshwater' => $faker->boolean(),
+                'terrestrial' => $faker->boolean(),
             ]);
         }
     }
